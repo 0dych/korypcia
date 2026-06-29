@@ -20,9 +20,10 @@
         <main id="quiz-container" class="card fade-in">
             <!-- Quiz Start Screen -->
             <div id="start-screen" class="screen active">
-                <div class="emoji-hero">💸</div>
-                <h2>Готові перевірити свою совість?</h2>
-                <p>12 життєвих ситуацій. 4 варіанти відповідей. Лише чесність... ну, або як піде.</p>
+                <div class="hero-badge">СЕКРЕТНЕ ДОСЬЄ 2026</div>
+                <div class="emoji-hero">💼💸🏛️</div>
+                <h2>Пройди тест на корупціонера!</h2>
+                <p>База з 35 життєвих ситуацій. Кожного разу — нові 12 питань.<br>Перевір, чи зможеш ти пройти шлях від волонтера до олігарха!</p>
                 <button id="start-btn" class="btn primary-btn">Почати тестування!</button>
             </div>
 
@@ -56,6 +57,27 @@
                 <div class="loot-box">
                     <h4>Потенційний заробіток:</h4>
                     <span id="potential-loot" class="loot-amount">0 грн</span>
+                </div>
+                
+                <!-- Certificate UI -->
+                <div id="certificate-container" class="certificate" style="display: none;">
+                    <div class="cert-border">
+                        <div class="cert-header">ОФІЦІЙНИЙ СЕРТИФІКАТ</div>
+                        <div class="cert-subtitle">Цим підтверджується, що пред'явник має кваліфікацію:</div>
+                        <div id="cert-title" class="cert-title">Свята людина</div>
+                        <div class="cert-body">
+                            Рівень корупційності: <span id="cert-percentage">0%</span><br><br>
+                            РЕКОМЕНДОВАНА ПОСАДА:<br>
+                            <span id="cert-position" class="cert-position-highlight">Волонтер</span>
+                        </div>
+                        <div class="cert-footer">
+                            <div class="cert-signature">
+                                <span>Підпис:</span>
+                                <div class="signature-line"></div>
+                            </div>
+                            <div class="cert-seal">ПЕЧАТКА<br>НЕ<br>ПОТРІБНА</div>
+                        </div>
+                    </div>
                 </div>
 
                 <button id="restart-btn" class="btn secondary-btn mt-20">Спробувати ще раз (відмити карму)</button>
