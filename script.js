@@ -61,6 +61,14 @@ const allQuestions = [
     { text: "Медична комісія і довідки (МСЕК).", options: [ { text: "У мене всі здорові стають інвалідами 1 групи за прайсом", score: 100 }, { text: "Можу 'допомогти' знайомим за символічну подяку", score: 50 }, { text: "Беру пакетами, щоб ніхто не бачив", score: 25 }, { text: "Видаю довідки виключно після ретельного медогляду", score: 0 } ] }
 ];
 
+const questionIcons = [
+    'fa-sack-dollar', 'fa-gavel', 'fa-building-columns', 'fa-handshake',
+    'fa-car', 'fa-file-invoice-dollar', 'fa-scale-balanced', 'fa-money-bill-wave',
+    'fa-passport', 'fa-briefcase', 'fa-gem', 'fa-landmark', 'fa-user-tie', 'fa-mask',
+    'fa-piggy-bank', 'fa-file-signature', 'fa-sack-xmark', 'fa-vault'
+];
+const animations = ['bounce', 'anim-shake', 'anim-spin-slow', 'anim-pulse'];
+
 let questions = []; // This will hold the random 12
 let currentQuestionIndex = 0;
 let totalScore = 0;
@@ -151,6 +159,12 @@ function showQuestion() {
     const progress = ((currentQuestionIndex) / questions.length) * 100;
     progressBarEl.style.width = `${progress}%`;
     questionNumberEl.textContent = `Питання ${currentQuestionIndex + 1}/${questions.length}`;
+    
+    // Random Icon and Animation
+    const randomIcon = questionIcons[Math.floor(Math.random() * questionIcons.length)];
+    const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+    const iconEl = document.getElementById('question-icon');
+    iconEl.innerHTML = `<i class="fa-solid ${randomIcon} ${randomAnim}"></i>`;
     
     questionTextEl.textContent = currentQuestion.text;
     
