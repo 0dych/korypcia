@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Наскільки ти корупціонер?</title>
+    <meta name="description" content="Пройди цей жартівливий тест і дізнайся свій рівень корупції та скільки ти б міг 'заробити'. Анонімно та весело!">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="background-animation"></div>
+    
+    <div class="container" id="app">
+        <header class="header">
+            <h1>Тест на "Справжнього Українського Чиновника" 💼</h1>
+            <p>Пройдіть анонімний тест та дізнайтесь свій відсоток корупційності!</p>
+        </header>
+
+        <main id="quiz-container" class="card fade-in">
+            <!-- Quiz Start Screen -->
+            <div id="start-screen" class="screen active">
+                <div class="emoji-hero">💸</div>
+                <h2>Готові перевірити свою совість?</h2>
+                <p>12 життєвих ситуацій. 4 варіанти відповідей. Лише чесність... ну, або як піде.</p>
+                <button id="start-btn" class="btn primary-btn">Почати тестування!</button>
+            </div>
+
+            <!-- Question Screen -->
+            <div id="question-screen" class="screen">
+                <div class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+                <div class="question-header">
+                    <span id="question-number" class="q-num">Питання 1/12</span>
+                </div>
+                <h3 id="question-text" class="q-text">Питання</h3>
+                <div id="options-container" class="options">
+                    <!-- Options will be generated here by JS -->
+                </div>
+            </div>
+
+            <!-- Result Screen -->
+            <div id="result-screen" class="screen text-center">
+                <h2 id="result-title">Ваш результат</h2>
+                <div class="result-circle">
+                    <svg viewBox="0 0 36 36" class="circular-chart">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path id="circle-progress" class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <text id="result-percentage" x="18" y="20.35" class="percentage">0%</text>
+                    </svg>
+                </div>
+                <h3 id="corruption-level-title" class="level-title">Рівень: Новачок</h3>
+                <p id="corruption-desc" class="result-desc">Опис результату...</p>
+                
+                <div class="loot-box">
+                    <h4>Потенційний заробіток:</h4>
+                    <span id="potential-loot" class="loot-amount">0 грн</span>
+                </div>
+
+                <button id="restart-btn" class="btn secondary-btn mt-20">Спробувати ще раз (відмити карму)</button>
+            </div>
+        </main>
+        
+        <!-- Footer removed as requested -->
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
