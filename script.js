@@ -63,6 +63,7 @@ const certPercentageEl = document.getElementById('cert-percentage');
 const certPositionEl = document.getElementById('cert-position');
 const certTitleEl = document.getElementById('cert-title');
 const certificateContainer = document.getElementById('certificate-container');
+const downloadBtn = document.getElementById('download-btn');
 
 // Randomize array
 function shuffle(array) {
@@ -79,7 +80,27 @@ restartBtn.addEventListener('click', () => {
     currentQuestionIndex = 0;
     totalScore = 0;
     certificateContainer.style.display = 'none';
+    downloadBtn.style.display = 'none';
     startQuiz();
+});
+
+downloadBtn.addEventListener('click', () => {
+    // Save original button text
+    const originalText = downloadBtn.innerHTML;
+    downloadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Завантаження...';
+    
+    html2canvas(certificateContainer, {
+        scale: 2, 
+        backgroundColor: '#fff'
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'cert_of_corruption.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        
+        // Restore button text
+        downloadBtn.innerHTML = originalText;
+    });
 });
 
 function startQuiz() {
@@ -182,9 +203,10 @@ function showResult() {
     
     potentialLootEl.textContent = finalPercentage === 0 ? "0 грн (але чиста совість)" : formattedLoot;
     
-    // Show certificate
+    // Show certificate and download button
     setTimeout(() => {
         certificateContainer.style.display = 'block';
+        downloadBtn.style.display = 'inline-block';
     }, 1500);
 }
 
