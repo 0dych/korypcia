@@ -17,19 +17,23 @@
     <div class="background-animation"></div>
     
     <div class="container" id="app">
-        <header class="header">
-            <h1>Тест на "Справжнього Українського Чиновника" 💼</h1>
-            <p>Пройдіть анонімний тест та дізнайтесь свій відсоток корупційності!</p>
-        </header>
-
         <main id="quiz-container" class="card fade-in">
             <!-- Quiz Start Screen -->
             <div id="start-screen" class="screen active">
-                <div class="hero-badge"><i class="fa-solid fa-user-secret"></i> СЕКРЕТНЕ ДОСЬЄ 2026</div>
-                <div class="emoji-hero bounce">💼💸🏛️</div>
-                <h2>Пройди тест на корупціонера!</h2>
-                <p>База з 60 життєвих ситуацій. Кожного разу — нові 12 питань.<br>Перевір, чи зможеш ти пройти шлях від волонтера до олігарха!</p>
-                <button id="start-btn" class="btn primary-btn"><i class="fa-solid fa-play"></i> Почати тестування!</button>
+                <div class="hero-icon">
+                    <i class="fa-solid fa-briefcase"></i>
+                </div>
+                <div class="hero-badge"><i class="fa-solid fa-user-secret"></i> ЦІЛКОМ ТАЄМНО</div>
+                <h2 class="premium-title"><span>"Справжній Український Чиновник"</span></h2>
+                <p class="premium-subtitle">Пройдіть анонімний тест, розкрийте свій прихований потенціал і дізнайтеся, яку посаду в державі ви насправді заслуговуєте.</p>
+                
+                <div class="stats-row">
+                    <div class="stat-item"><i class="fa-solid fa-database"></i> 60 ситуацій</div>
+                    <div class="stat-item"><i class="fa-solid fa-user-tie"></i> 40 посад</div>
+                    <div class="stat-item"><i class="fa-solid fa-mask"></i> Анонімно</div>
+                </div>
+
+                <button id="start-btn" class="btn primary-btn pulse-btn"><i class="fa-solid fa-power-off"></i> Розпочати перевірку</button>
             </div>
 
             <!-- Question Screen -->
@@ -40,6 +44,7 @@
                 <div class="question-header">
                     <span id="question-number" class="q-num">Питання 1/12</span>
                 </div>
+                <div id="question-icon" class="question-icon-container"></div>
                 <h3 id="question-text" class="q-text">Питання</h3>
                 <div id="options-container" class="options">
                     <!-- Options will be generated here by JS -->
@@ -77,10 +82,12 @@
                         </div>
                         <div class="cert-footer">
                             <div class="cert-signature">
-                                <span>Підпис:</span>
-                                <div class="signature-line"></div>
+                                <span>Затверджено:</span>
+                                <div class="signature-line">Система</div>
                             </div>
-                            <div class="cert-seal">ПЕЧАТКА<br>НЕ<br>ПОТРІБНА</div>
+                            <div class="cert-seal">
+                                СХВАЛЕНО<br>★<br>ОСВОЄНО
+                            </div>
                         </div>
                     </div>
                 </div>
