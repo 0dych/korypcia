@@ -326,6 +326,83 @@ if (quoteTextEl) {
     setInterval(changeQuote, 7000);
 }
 
+// --- ANONYMOUS CHAT LOGIC ---
+const chatWidget = document.getElementById('anonymous-chat');
+const chatHeader = document.getElementById('chat-header');
+const chatToggleIcon = document.getElementById('chat-toggle-icon');
+const chatMessages = document.getElementById('chat-messages');
+const chatInput = document.getElementById('chat-input');
+const chatSendBtn = document.getElementById('chat-send-btn');
+const onlineCountEl = document.getElementById('online-count');
+
+// Toggle Chat
+chatHeader.addEventListener('click', () => {
+    chatWidget.classList.toggle('collapsed');
+    if(chatWidget.classList.contains('collapsed')) {
+        chatToggleIcon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+    } else {
+        chatToggleIcon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+});
+
+function addChatMessage(author, text, isSelf = false) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `chat-msg ${isSelf ? 'self' : ''}`;
+    msgDiv.innerHTML = `
+        <div class="chat-author">${author}</div>
+        <div class="chat-text">${text}</div>
+    `;
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// User sending message
+function handleSendMsg() {
+    const text = chatInput.value.trim();
+    if(text) {
+        addChatMessage('Ви (Хабарник ' + Math.floor(Math.random() * 999) + ')', text, true);
+        chatInput.value = '';
+    }
+}
+chatSendBtn.addEventListener('click', handleSendMsg);
+chatInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') handleSendMsg(); });
+
+// Fake Bot Logic
+const botNames = ["Хабарник 42", "Анонімний Митник", "Депутат_Х", "Суддя Дредд", "Свідок_НАБУ", "Просто_Кум", "Держ_Закупівля", "Готівка"];
+const botMessages = [
+    "Хто знає, який зараз тариф на довідку з БТІ?",
+    "Тендер пройшов успішно. Гроші в офшорі.",
+    "Хлопці, хто забув дипломат з грошима в приймальні?",
+    "Курс росте, пора піднімати відкати.",
+    "Шукаю надійного підставного директора на фірму-одноденку.",
+    "Мене сьогодні ледь не зловили! Добре, що поділився.",
+    "Продам місце в списку партії. Недорого.",
+    "Хто підкаже хорошого адвоката?",
+    "Сьогодні знижка на вирішення питань у податковій!",
+    "Не підкажете, де краще ховати золото?",
+    "Куплю острів. Розгляну всі варіанти.",
+    "Шеф сказав, що завтра всі схеми множимо на два."
+];
+
+// Start chat collapsed
+chatWidget.classList.add('collapsed');
+
+setInterval(() => {
+    const online = Math.floor(Math.random() * 20) + 30;
+    onlineCountEl.textContent = online;
+}, 5000);
+
+function botChatLoop() {
+    setTimeout(() => {
+        const name = botNames[Math.floor(Math.random() * botNames.length)];
+        const text = botMessages[Math.floor(Math.random() * botMessages.length)];
+        addChatMessage(name, text);
+        botChatLoop();
+    }, Math.random() * 8000 + 3000); // every 3-11 seconds
+}
+botChatLoop();
+
 // --- ARCADE GAME LOGIC ---
 
 let gameContext = gameCanvas.getContext('2d');
