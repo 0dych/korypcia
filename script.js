@@ -98,6 +98,12 @@ const certTitleEl = document.getElementById('cert-title');
 const certificateContainer = document.getElementById('certificate-container');
 const downloadBtn = document.getElementById('download-btn');
 
+// Confirm Modal Elements
+const quitQuizBtn = document.getElementById('quit-quiz-btn');
+const confirmModal = document.getElementById('confirm-modal');
+const confirmYesBtn = document.getElementById('confirm-yes-btn');
+const confirmNoBtn = document.getElementById('confirm-no-btn');
+
 // Game UI Elements
 const playGameBtn = document.getElementById('play-game-btn');
 const gameScreen = document.getElementById('game-screen');
@@ -127,6 +133,23 @@ restartBtn.addEventListener('click', () => {
     certificateContainer.style.display = 'none';
     downloadBtn.style.display = 'none';
     startQuiz();
+});
+
+// Quit Quiz Logic
+quitQuizBtn.addEventListener('click', () => {
+    confirmModal.style.display = 'flex';
+});
+
+confirmNoBtn.addEventListener('click', () => {
+    confirmModal.style.display = 'none';
+});
+
+confirmYesBtn.addEventListener('click', () => {
+    confirmModal.style.display = 'none';
+    currentQuestionIndex = 0;
+    totalScore = 0;
+    questionScreen.classList.remove('active');
+    startScreen.classList.add('active');
 });
 
 downloadBtn.addEventListener('click', () => {
@@ -227,6 +250,81 @@ downloadBtn.addEventListener('click', () => {
     link.href = dataUrl;
     link.click();
 });
+
+// --- QUOTES LOGIC ---
+const corruptionQuotes = [
+    { text: "Щоб перемогти корупцію, її треба очолити.", author: "Класика жанру" },
+    { text: "Хабар — це не злочин, це інвестиція в пришвидшення документообігу.", author: "Невідомий чиновник" },
+    { text: "Ми не беремо хабарі, ми беремо на зберігання.", author: "Черговий митник" },
+    { text: "Корупція — це як гравітація. Її не видно, але вона тримає все разом.", author: "Інтернет-філософ" },
+    { text: "Закон як дишло: куди заніс — туди й вийшло.", author: "Народна мудрість" },
+    { text: "Я не брав, воно саме в кишеню впало.", author: "З протоколу допиту" },
+    { text: "Не підмажеш — не поїдеш. А підмажеш — полетиш.", author: "Життєвий досвід" },
+    { text: "Головне під час слідства — не вийти на самих себе.", author: "Золоте правило НАБУ" },
+    { text: "Він крав так чесно, що йому хотілося дати ще.", author: "З відгуків виборців" },
+    { text: "Бюджет як торт — всім хочеться відкусити найбільший шматок, поки ніхто не бачить.", author: "Бюджетний комітет" },
+    { text: "З мішком золота можна відкрити будь-які двері. Навіть у камеру.", author: "Східна мудрість" },
+    { text: "Скільки чиновника не годуй, він все одно в офшор дивиться.", author: "Сучасне прислів'я" },
+    { text: "Депутатська недоторканність — це коли тебе всі хочуть торкнутися, а не можна.", author: "З кулуарів" },
+    { text: "У нас не крадуть, у нас 'засвоюють' кошти.", author: "Офіційний коментар" },
+    { text: "Брати чи не брати? Ось у чому питання. А, вже взяв.", author: "Гамлет з адміністрації" },
+    { text: "Немає таких тендерів, які б не виграв кум.", author: "Забутий політтехнолог" },
+    { text: "Чесність — це коли тебе ще просто не запросили в долю.", author: "Золоте правило" },
+    { text: "Держава багата, всім вистачить. Головне — правильно стояти біля корита.", author: "Анонімний оптиміст" },
+    { text: "Відкати не горять.", author: "Класика держзакупівель" },
+    { text: "Я б змінив систему, але вона так добре платить.", author: "Щиросердне зізнання" },
+    { text: "Депутат обіцяє міст там, де немає річки. А потім списує гроші.", author: "З народного епосу" },
+    { text: "Скільки вовка не годуй, а чиновник краде більше.", author: "Новітня зоологія" },
+    { text: "Корупція — це змазка на іржавих коліщатках нашої бюрократії.", author: "Механік-чиновник" },
+    { text: "Красти вагонами — це бізнес, красти мішками — це вже кримінал.", author: "Юридичний казус" },
+    { text: "Політика — це мистецтво отримувати голоси бідних і гроші багатих.", author: "Життєва мудрість" },
+    { text: "Що охороняємо, те й маємо.", author: "Михайло Жванецький" },
+    { text: "Не спійманий — не депутат.", author: "Юридична аксіома" },
+    { text: "Вкрав буханку хліба — сів у тюрму, вкрав завод — сів у парламент.", author: "Сувора реальність" },
+    { text: "Моя хата скраю, але паркан будуємо за бюджетні кошти.", author: "Новий формат прислів'я" },
+    { text: "Закон суворий, але якщо дуже треба, то можна.", author: "Загальновідомий факт" },
+    { text: "Відсутність судимості — це не ваша заслуга, а недопрацювання прокуратури.", author: "Класика органів" },
+    { text: "Всі ми люди, але дехто — бюджетні розпорядники.", author: "Бухгалтерська філософія" },
+    { text: "Наш девіз: 'Красти менше не можна, більше — не виходить'.", author: "З кулуарних розмов" },
+    { text: "Кожна реформа в нас починається з ремонту кабінету реформатора.", author: "Архітектурна традиція" },
+    { text: "Дав хабара — спи спокійно. На Карибах.", author: "Рекламний слоган" },
+    { text: "Не шукайте правди там, де вже поділили бюджет.", author: "Фінансове правило" },
+    { text: "Кращий засіб від безсоння — швейцарський рахунок.", author: "Народна медицина" },
+    { text: "Будь-яка проблема вирішується, питання лише в кількості нулів.", author: "Математика для дорослих" },
+    { text: "Ми живемо в епоху, коли чесність — це скоріше діагноз, ніж чеснота.", author: "Спостереження лікаря" },
+    { text: "Борітеся — поборете! Тільки узгодьте це спочатку з керівництвом.", author: "Корпоративна етика" },
+    { text: "Красти з прибутків — це бізнес, красти зі збитків — це талант.", author: "Економічна теорія" },
+    { text: "Хочеш жити — вмій вертітись, хочеш добре жити — вмій домовитись.", author: "Практичний посібник" },
+    { text: "Не май сто рублів, а май сто друзів. Бажано — у суді та прокуратурі.", author: "Сучасний переклад" },
+    { text: "Чесний чиновник як єті — всі про нього говорять, але ніхто не бачив.", author: "Криптозоологія" },
+    { text: "Закон не працює заднім числом, але відкати — завжди.", author: "Юридичний парадокс" },
+    { text: "Гроші не пахнуть, але іноді вони шелестять в конверті.", author: "Парфумер-любитель" },
+    { text: "Якщо тендер виграв не кум, значить кум захворів.", author: "Прикмета" },
+    { text: "Рука руку миє, а обидві — бюджет.", author: "Нова анатомія" },
+    { text: "Ми подолаємо корупцію! Одразу після того, як купимо собі по квартирі.", author: "Передвиборча обіцянка" },
+    { text: "Головне в житті — не переплутати власну кишеню з державною.", author: "Найважче завдання" }
+];
+
+const quoteTextEl = document.getElementById('daily-quote');
+const quoteAuthorEl = document.getElementById('quote-author');
+const quoteBox = document.querySelector('.quote-box');
+
+function changeQuote() {
+    if (!quoteBox) return;
+    quoteBox.style.opacity = 0;
+    
+    setTimeout(() => {
+        const randomQ = corruptionQuotes[Math.floor(Math.random() * corruptionQuotes.length)];
+        quoteTextEl.textContent = `"${randomQ.text}"`;
+        quoteAuthorEl.textContent = `— ${randomQ.author}`;
+        quoteBox.style.opacity = 1;
+    }, 500);
+}
+
+if (quoteTextEl) {
+    changeQuote();
+    setInterval(changeQuote, 7000);
+}
 
 // --- ARCADE GAME LOGIC ---
 
