@@ -367,3 +367,14 @@ h1, h2, h3, h4 {
 }
 @keyframes spin-slow { 100% { transform: rotate(360deg); } }
 @keyframes pulse-scale { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+
+/* Arcade Game Styles */
+.game-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px; }
+.game-stats { display: flex; gap: 10px; }
+.game-stat-box { background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 1.1rem; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 8px; }
+.game-lives { color: #ef4444; font-size: 1.3rem; display: flex; gap: 5px; }
+.canvas-container { position: relative; width: 100%; max-width: 400px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.6); background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border: 2px solid rgba(255,255,255,0.1); }
+canvas { display: block; width: 100%; height: auto; touch-action: none; }
+.game-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; z-index: 10; }
+.game-overlay h3 { font-size: 2.5rem; color: #ef4444; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; }
+.game-overlay p { font-size: 1.2rem; margin-bottom: 20px; }

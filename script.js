@@ -98,6 +98,18 @@ const certTitleEl = document.getElementById('cert-title');
 const certificateContainer = document.getElementById('certificate-container');
 const downloadBtn = document.getElementById('download-btn');
 
+// Game UI Elements
+const playGameBtn = document.getElementById('play-game-btn');
+const gameScreen = document.getElementById('game-screen');
+const gameCanvas = document.getElementById('gameCanvas');
+const gameScoreVal = document.getElementById('game-score-val');
+const gameRecordVal = document.getElementById('game-record-val');
+const gameLivesEl = document.getElementById('game-lives');
+const gameOverOverlay = document.getElementById('game-over-overlay');
+const finalGameScore = document.getElementById('final-game-score');
+const restartGameBtn = document.getElementById('restart-game-btn');
+const exitGameBtn = document.getElementById('exit-game-btn');
+
 // Randomize array
 function shuffle(array) {
     let newArray = [...array];
@@ -118,23 +130,380 @@ restartBtn.addEventListener('click', () => {
 });
 
 downloadBtn.addEventListener('click', () => {
-    // Save original button text
-    const originalText = downloadBtn.innerHTML;
-    downloadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Завантаження...';
+    // Generate certificate natively on a canvas to avoid file:/// CORS issues
+    const certCanvas = document.createElement('canvas');
+    certCanvas.width = 800;
+    certCanvas.height = 600;
+    const ctx = certCanvas.getContext('2d');
     
-    domtoimage.toPng(certificateContainer, { bgcolor: '#fff' })
-        .then(function (dataUrl) {
-            const link = document.createElement('a');
-            link.download = 'cert_of_corruption.png';
-            link.href = dataUrl;
-            link.click();
-            downloadBtn.innerHTML = originalText;
-        })
-        .catch(function (error) {
-            console.error('oops, something went wrong!', error);
-            alert('Помилка збереження! Запустіть файл через локальний сервер (Live Server).');
-            downloadBtn.innerHTML = originalText;
-        });
+    // Background
+    const gradient = ctx.createLinearGradient(0, 0, 800, 600);
+    gradient.addColorStop(0, '#fdfbfb');
+    gradient.addColorStop(1, '#ebedee');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 800, 600);
+    
+    // Border
+    ctx.strokeStyle = '#b8860b';
+    ctx.lineWidth = 10;
+    ctx.strokeRect(20, 20, 760, 560);
+    ctx.lineWidth = 2;
+    ctx.strokeRect(35, 35, 730, 530);
+    
+    // Header
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#b8860b';
+    ctx.font = 'bold 36px "Times New Roman", serif';
+    ctx.fillText('ОФІЦІЙНИЙ СЕРТИФІКАТ', 400, 90);
+    
+    // Subtitle
+    ctx.fillStyle = '#4b5563';
+    ctx.font = 'italic 20px "Times New Roman", serif';
+    ctx.fillText('Цим підтверджується, що пред\'явник має кваліфікацію:', 400, 140);
+    
+    // Title
+    ctx.fillStyle = '#7f1d1d';
+    ctx.font = 'bold 48px "Times New Roman", serif';
+    ctx.fillText(document.getElementById('cert-title').textContent, 400, 210);
+    
+    // Body
+    ctx.fillStyle = '#1f2937';
+    ctx.font = '24px "Times New Roman", serif';
+    ctx.fillText('Рівень корупційності: ' + document.getElementById('cert-percentage').textContent, 400, 280);
+    
+    ctx.font = '20px "Times New Roman", serif';
+    ctx.fillText('РЕКОМЕНДОВАНА ПОСАДА:', 400, 330);
+    
+    ctx.fillStyle = '#b8860b';
+    ctx.font = 'bold 32px "Times New Roman", serif';
+    ctx.fillText(document.getElementById('cert-position').textContent, 400, 380);
+    
+    // Signature
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#4b5563';
+    ctx.font = 'italic 20px "Times New Roman", serif';
+    ctx.fillText('Затверджено:', 100, 480);
+    
+    ctx.fillStyle = '#1e3a8a';
+    ctx.font = '40px "Brush Script MT", cursive';
+    ctx.fillText('Система', 120, 520);
+    
+    ctx.strokeStyle = '#1f2937';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(100, 530);
+    ctx.lineTo(280, 530);
+    ctx.stroke();
+    
+    // Seal
+    ctx.beginPath();
+    ctx.arc(650, 480, 60, 0, 2 * Math.PI);
+    const sealGrad = ctx.createRadialGradient(650, 480, 10, 650, 480, 60);
+    sealGrad.addColorStop(0, '#dc2626');
+    sealGrad.addColorStop(1, '#991b1b');
+    ctx.fillStyle = sealGrad;
+    ctx.fill();
+    ctx.strokeStyle = '#fca5a5';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(650, 480, 52, 0, 2 * Math.PI);
+    ctx.setLineDash([5, 5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fef2f2';
+    ctx.font = 'bold 16px "Times New Roman", serif';
+    ctx.fillText('СХВАЛЕНО', 650, 460);
+    ctx.fillText('★', 650, 485);
+    ctx.fillText('ОСВОЄНО', 650, 510);
+    
+    // Download
+    const dataUrl = certCanvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = 'cert_of_corruption.png';
+    link.href = dataUrl;
+    link.click();
+});
+
+// --- ARCADE GAME LOGIC ---
+
+let gameContext = gameCanvas.getContext('2d');
+let gameLoopId;
+let gameIsActive = false;
+
+// Game State
+let gameScore = 0;
+let gameLives = 3;
+let highScore = localStorage.getItem('corruptionHighScore') || 0;
+gameRecordVal.textContent = highScore;
+
+// Audio Context setup
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+
+function playSound(type) {
+    if (!audioCtx) audioCtx = new AudioContext();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    if (type === 'coin') {
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.1);
+    } else if (type === 'hit') {
+        oscillator.type = 'sawtooth';
+        oscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.3);
+        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.3);
+    }
+}
+
+const player = { x: 170, y: 430, width: 60, height: 50 };
+let playerFace = '💼';
+let faceResetTimer = null;
+
+let fallingItems = [];
+let floatingTexts = []; // For funny popups
+
+// Constants for items
+const ITEM_TYPES = [
+    { type: 'money', icon: '💵', points: 10, prob: 0.6, phrases: ["В офшор!", "На каву", "+10"] },
+    { type: 'gold', icon: '🥖', points: 50, prob: 0.1, phrases: ["Золотий батон!", "Для кума", "+50"] },
+    { type: 'diamond', icon: '💎', points: 100, prob: 0.05, phrases: ["Тещі на дачу!", "Елітний хабар", "Джекпот!"] },
+    { type: 'cuffs', icon: '🔗', points: -1, prob: 0.15, phrases: ["Арешт!", "САП!", "СІЗО!"] },
+    { type: 'folder', icon: '📂', points: -1, prob: 0.1, phrases: ["НАБУ!", "Підозра!", "Обшук!"] }
+];
+
+function spawnItem() {
+    if (!gameIsActive) return;
+    const rand = Math.random();
+    let cumulative = 0;
+    let selectedType = ITEM_TYPES[0];
+    
+    for (const item of ITEM_TYPES) {
+        cumulative += item.prob;
+        if (rand <= cumulative) {
+            selectedType = item;
+            break;
+        }
+    }
+    
+    fallingItems.push({
+        x: Math.random() * (gameCanvas.width - 30),
+        y: -30,
+        width: 30,
+        height: 30,
+        speed: 2 + Math.random() * 3 + (gameScore / 400), // Gets faster quicker
+        rotation: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 10,
+        ...selectedType
+    });
+    
+    setTimeout(spawnItem, Math.max(150, 800 - (gameScore * 0.6))); 
+}
+
+function drawPlayer() {
+    gameContext.font = '50px Arial';
+    gameContext.textAlign = 'center';
+    gameContext.textBaseline = 'middle';
+    gameContext.fillText(playerFace, player.x + player.width/2, player.y + player.height/2);
+}
+
+function drawItems() {
+    gameContext.textAlign = 'center';
+    gameContext.textBaseline = 'middle';
+    
+    fallingItems.forEach(item => {
+        gameContext.save();
+        gameContext.translate(item.x + item.width/2, item.y + item.height/2);
+        
+        item.rotation += item.rotSpeed;
+        gameContext.rotate(item.rotation * Math.PI / 180);
+        
+        gameContext.font = item.points >= 50 ? '38px Arial' : '30px Arial';
+        gameContext.fillText(item.icon, 0, 0);
+        
+        gameContext.restore();
+    });
+}
+
+function updateGame() {
+    if (!gameIsActive) return;
+    
+    // Background gradient
+    let bgGrad = gameContext.createLinearGradient(0, 0, 0, gameCanvas.height);
+    bgGrad.addColorStop(0, '#0f172a');
+    bgGrad.addColorStop(1, '#1e293b');
+    gameContext.fillStyle = bgGrad;
+    gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+    
+    // Secret watermark
+    gameContext.globalAlpha = 0.05;
+    gameContext.font = 'bold 50px Arial';
+    gameContext.textAlign = 'center';
+    gameContext.fillStyle = '#ffffff';
+    gameContext.fillText('ЦІЛКОМ ТАЄМНО', gameCanvas.width/2, gameCanvas.height/2);
+    gameContext.globalAlpha = 1.0;
+    
+    // Update items
+    for (let i = fallingItems.length - 1; i >= 0; i--) {
+        let item = fallingItems[i];
+        item.y += item.speed;
+        
+        // Collision check
+        if (item.y + item.height > player.y && item.y < player.y + player.height && 
+            item.x + item.width > player.x && item.x < player.x + player.width) {
+                
+            let phrase = item.phrases[Math.floor(Math.random() * item.phrases.length)];
+            
+            if (item.points > 0) {
+                gameScore += item.points;
+                playSound('coin');
+                playerFace = '🤑';
+                floatingTexts.push({ x: player.x + player.width/2, y: player.y, text: phrase, alpha: 1, color: '#10b981' });
+            } else {
+                gameLives--;
+                updateLivesDisplay();
+                playSound('hit');
+                playerFace = '😱';
+                floatingTexts.push({ x: player.x + player.width/2, y: player.y, text: phrase, alpha: 1, color: '#ef4444' });
+                
+                if (gameLives <= 0) {
+                    playerFace = '🚓';
+                    endGame();
+                    return;
+                }
+            }
+            
+            if (faceResetTimer) clearTimeout(faceResetTimer);
+            faceResetTimer = setTimeout(() => { if(gameIsActive) playerFace = '💼'; }, 400);
+            
+            fallingItems.splice(i, 1);
+            continue;
+        }
+        
+        // Off screen
+        if (item.y > gameCanvas.height) {
+            fallingItems.splice(i, 1);
+        }
+    }
+    
+    gameScoreVal.textContent = gameScore;
+    
+    drawPlayer();
+    drawItems();
+    
+    // Draw Floating Texts
+    for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        let ft = floatingTexts[i];
+        ft.y -= 1.5;
+        ft.alpha -= 0.02;
+        
+        gameContext.globalAlpha = ft.alpha;
+        gameContext.font = 'bold 22px "Montserrat", sans-serif';
+        gameContext.fillStyle = ft.color;
+        gameContext.textAlign = 'center';
+        
+        // Removed text shadow for performance
+        gameContext.fillText(ft.text, ft.x, ft.y);
+        
+        if (ft.alpha <= 0) {
+            floatingTexts.splice(i, 1);
+        }
+    }
+    gameContext.globalAlpha = 1.0;
+    
+    gameLoopId = requestAnimationFrame(updateGame);
+}
+
+function updateLivesDisplay() {
+    gameLivesEl.innerHTML = '';
+    for(let i=0; i<gameLives; i++) {
+        gameLivesEl.innerHTML += '<i class="fa-solid fa-heart"></i>';
+    }
+    for(let i=gameLives; i<3; i++) {
+        gameLivesEl.innerHTML += '<i class="fa-regular fa-heart" style="opacity: 0.3"></i>';
+    }
+}
+
+function startGame() {
+    startScreen.classList.remove('active');
+    gameScreen.classList.add('active');
+    gameOverOverlay.style.display = 'none';
+    
+    gameScore = 0;
+    gameLives = 3;
+    fallingItems = [];
+    floatingTexts = [];
+    playerFace = '💼';
+    player.x = gameCanvas.width/2 - player.width/2;
+    
+    updateLivesDisplay();
+    gameScoreVal.textContent = '0';
+    
+    gameIsActive = true;
+    updateGame();
+    setTimeout(spawnItem, 500);
+}
+
+function endGame() {
+    gameIsActive = false;
+    cancelAnimationFrame(gameLoopId);
+    
+    if (gameScore > highScore) {
+        highScore = gameScore;
+        localStorage.setItem('corruptionHighScore', highScore);
+        gameRecordVal.textContent = highScore;
+    }
+    
+    finalGameScore.textContent = gameScore;
+    gameOverOverlay.style.display = 'flex';
+}
+
+// Controls
+function handleMove(clientX) {
+    const rect = gameCanvas.getBoundingClientRect();
+    const scaleX = gameCanvas.width / rect.width;
+    let x = (clientX - rect.left) * scaleX;
+    
+    player.x = x - player.width/2;
+    if (player.x < 0) player.x = 0;
+    if (player.x + player.width > gameCanvas.width) player.x = gameCanvas.width - player.width;
+}
+
+gameCanvas.addEventListener('mousemove', (e) => {
+    if (gameIsActive) handleMove(e.clientX);
+});
+
+gameCanvas.addEventListener('touchmove', (e) => {
+    if (gameIsActive) {
+        e.preventDefault();
+        handleMove(e.touches[0].clientX);
+    }
+}, {passive: false});
+
+// Event Listeners for Game Buttons
+playGameBtn.addEventListener('click', startGame);
+restartGameBtn.addEventListener('click', startGame);
+exitGameBtn.addEventListener('click', () => {
+    gameIsActive = false;
+    cancelAnimationFrame(gameLoopId);
+    gameScreen.classList.remove('active');
+    startScreen.classList.add('active');
 });
 
 function startQuiz() {

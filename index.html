@@ -6,9 +6,8 @@
     <title>Тест: Наскільки ти корупціонер?</title>
     <meta name="description" content="Пройди цей жартівливий тест і дізнайся свій рівень корупції та скільки ти б міг 'заробити'. Анонімно та весело!">
     
-    <!-- FontAwesome and dom-to-image for Icons and Downloading -->
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -34,6 +33,7 @@
                 </div>
 
                 <button id="start-btn" class="btn primary-btn pulse-btn"><i class="fa-solid fa-power-off"></i> Розпочати перевірку</button>
+                <button id="play-game-btn" class="btn secondary-btn mt-20" style="border: 1px solid #10b981; color: #10b981;"><i class="fa-solid fa-gamepad"></i> Міні-гра: Спритний хабарник</button>
             </div>
 
             <!-- Question Screen -->
@@ -98,6 +98,32 @@
                 </button>
 
                 <button id="restart-btn" class="btn secondary-btn mt-20"><i class="fa-solid fa-rotate-right"></i> Спробувати ще раз (відмити карму)</button>
+            </div>
+            
+            <!-- Game Screen -->
+            <div id="game-screen" class="screen">
+                <div class="game-header">
+                    <div class="game-stats">
+                        <div class="game-stat-box"><i class="fa-solid fa-coins" style="color: #f59e0b;"></i> <span id="game-score-val">0</span></div>
+                        <div class="game-stat-box"><i class="fa-solid fa-trophy" style="color: #fbbf24;"></i> <span id="game-record-val">0</span></div>
+                    </div>
+                    <div class="game-lives" id="game-lives">
+                        <i class="fa-solid fa-heart"></i>
+                        <i class="fa-solid fa-heart"></i>
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="gameCanvas" width="400" height="500"></canvas>
+                    
+                    <div id="game-over-overlay" class="game-overlay" style="display: none;">
+                        <h3>Арешт! 🔗</h3>
+                        <p>Ви встигли зібрати: <br><span id="final-game-score" style="font-size: 2rem; color: #10b981; font-weight: bold;">0</span></p>
+                        <button id="restart-game-btn" class="btn action-btn"><i class="fa-solid fa-rotate-right"></i> Ще одну схему</button>
+                        <button id="exit-game-btn" class="btn secondary-btn mt-20"><i class="fa-solid fa-right-from-bracket"></i> Втікати в меню</button>
+                    </div>
+                </div>
             </div>
         </main>
         
